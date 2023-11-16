@@ -159,9 +159,9 @@ public:
         INT64 *WTT;
         INT64 MR;
         REAL64 RM;
-        int locKQUES;
+        int *locKQUES;
         REAL64 *QUES = new REAL64[LHEADS];
-        locKQUES = *QUES;
+        locKQUES = &QUES;
         // STDK = 'B' means setting to the head of the queue
         C = STDK;
         NPINPA = NPINDC;
@@ -210,11 +210,23 @@ public:
         KT = KQUESE[2] + ENV_1_I64;
         KQUESE[2] = MR;
     }
+	
+	
     void HDFWrite();
+	
+	
     void HDFRead();
+	
+	
     void pack();
+	
+	
     void MPI_Normalize();
+	
+	
     void MPI_Equalizer();
+	
+	
     void destroy();
     
     //
