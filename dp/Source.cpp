@@ -164,9 +164,9 @@ public:
         INT64 MR ;
         void * vMR= &MR;
         REAL64* RM = (REAL64 *)  vMR;
-        int locKQUES;
+        //int locKQUES;
         REAL64 *QUES = new REAL64[LHEADS];
-        locKQUES = *QUES;
+        //locKQUES = *QUES;
         // STDK = 'B' means setting to the head of the queue
         C = STDK;
         NPINPA = NPINDC;
