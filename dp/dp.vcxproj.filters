@@ -23,5 +23,8 @@
     <ClInclude Include="ENV_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Bank.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
