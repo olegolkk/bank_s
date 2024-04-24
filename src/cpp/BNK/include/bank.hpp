@@ -1,13 +1,16 @@
 #pragma once
 #include <cstdio>
 #include <string>
-#include "ENV_types.h"
+#include "ENV_types.hpp"
 
 #define NIRP 48
 #define LSTATE 25
 
+using namespace ENV;
+
 // ќбъ€вление класса
-class BANK_Struct {
+class BANK_Struct
+{
     STRING name;
     INT32 iError = ENV_0_I32;
     INT32 NMQUE = ENV_0_I32;

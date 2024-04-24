@@ -15,15 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp">
-      <Filter>Resource Files</Filter>
+    <ClCompile Include="..\src\cpp\BNK\bank\bank.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ENV_types.h">
+    <ClInclude Include="..\src\cpp\BNK\include\bank.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Bank.h">
+    <ClInclude Include="..\src\cpp\BNK\include\ENV_types.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\cpp\BNK\include\ENV_HDF5.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
