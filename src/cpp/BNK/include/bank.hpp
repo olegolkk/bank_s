@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <string>
 #include "ENV_types.hpp"
+#include "ENV_HDF5.hpp"
 
 #define NIRP 48
 #define LSTATE 25
@@ -39,6 +40,7 @@ private:
     void free(const INT64 NQUE, REAL64 WT, INT64 NN);
     void pack(INT64 KFT, INT64 HQ0, INT64 KQB, INT64 KQT, INT64 LBLKD, INT64 MEM, INT64 NI);
     void create(const STRING name, const INT32 MPI_MODE, const INT32 NMQUE);
+    void HDFRead(hid_t parent_id, const char* Group = nullptr);
     void destroy();
     void bnkFinal();
 };
