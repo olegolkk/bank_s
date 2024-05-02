@@ -4,6 +4,7 @@
 #include "ENV_types.hpp"
 #include "bank.hpp"
 
+
 #define NIRP 48
 #define LSTATE 25
 #define BANK_INT32_ATTRIBUTES_COUNT 2
@@ -379,12 +380,9 @@ void BANK_Struct::create(const STRING name, const INT32 MPI_MODE, const INT32 NM
     LHEADS = this->NMQUE * 4;
     LMQEXT = LHEADS + nKQUESE;
 
-    INT64* KQUESE = new INT64[nKQUESE];
-    *KQUESE = ENV_0_I64;
-    INT64* KQUES = new INT64[LHEADS];
-    *KQUES = ENV_0_I64;
-    REAL64* QueueWeight = new REAL64[NMQUE];
-    *QueueWeight = ENV_0_R64;
+    INT64* KQUESE = new INT64[nKQUESE]{};
+    INT64* KQUES = new INT64[LHEADS]{};
+    REAL64* QueueWeight = new REAL64[NMQUE]{};
 
     KQUESE[0] = pow(2, 18);
     KQUESE[4] = NIRP;
@@ -393,8 +391,7 @@ void BANK_Struct::create(const STRING name, const INT32 MPI_MODE, const INT32 NM
     KQUESE[5] = KQUESE[0] / KQUESE[3];
     KQUESE[6] = ENV_0_I64;
 
-    INT64* BnkMemb = new INT64[KQUESE[1]];
-    *BnkMemb = ENV_0_I64;
+    INT64* BnkMemb = new INT64[KQUESE[1]]{};
 
     this->name = name;
 
@@ -402,8 +399,9 @@ void BANK_Struct::create(const STRING name, const INT32 MPI_MODE, const INT32 NM
 
     // ENV_MPI_Comm_size(MPI_SIZE);
     // ENV_MPI_Comm_rank(MPI_ID);
-    try {
-        REAL64* MPI_BNK_WEIGHTS = new REAL64[MPI_SIZE];
+    try
+    {
+        MPI_BNK_WEIGHTS = new REAL64[MPI_SIZE];
     }
     catch (const std::bad_alloc& e)
     {
@@ -414,39 +412,44 @@ void BANK_Struct::create(const STRING name, const INT32 MPI_MODE, const INT32 NM
 }
 
 // Read the bank and other from HDF-file
-void BANK_Struct::HDFRead(hid_t parent_id, const std::string& Group = "") {
+void BANK_Struct::HDFRead(hid_t parent_id, const std::string& Group)
+{
     hid_t group_id;
     std::string GroupName;
-    int32_t result_int32[BANK_INT32_ATTRIBUTES_COUNT];
-    bool lError;
+    LOGICAL lError;
     int32_t NQUEUE;
     int32_t MPI_MODE;
 
     this->destroy();
 
     // Open an existing group in the specified file group.
-    if (!Group.empty()) {
+    if (!Group.empty())
+    {
         GroupName = Group;
-        this->name = Group;
+        name = Group;
     }
-    else {
+    else
+    {
         GroupName = this->name;
     }
 
-    if (GroupName.length() > 0) {
-        H5Gopen(parent_id, GroupName.c_str(), H5P_DEFAULT, group_id);
+    iError = ENV_0_I32;
+    if (GroupName.length() > 0)
+    {
+        group_id = ENV_H5::HDF_Group_Open(parent_id, GroupName, iError);
     }
-    else {
+    else
+    {
         group_id = parent_id;
-        this->iError = ENV_0_I32;
     }
 
-    if (this->iError != ENV_0_I32) {
+    if (group_id < 0)
+    {
         error_message[1] = "Error in bnkHDFRead. Group Open Error '" + GroupName + "'.";
         StopByError(-3001, &error_message);
     }
-
-    lError = HDF_HeaderReadSimple(group_id, "", BANK_INT32_ATTRIBUTES_NAMES, result_int32, this->iError);
+    VECTOR<INT32> result_int32;
+    lError = ENV_H5::HDF_Read_Attributes(result_int32, V_STRING{"", ""}, group_id);
     if (!lError) {
         error_message[1] = "Error in bnkHDFRead: cannot read int32 attributes.";
         StopByError(-3001, &error_message);
@@ -456,36 +459,40 @@ void BANK_Struct::HDFRead(hid_t parent_id, const std::string& Group = "") {
     MPI_MODE = result_int32[1];
     this->create(GroupName, MPI_MODE, NQUEUE);
 
-    if (!HDF_Read(this->KQUESE, group_id, "KQUESE")) {
+    if (!( = ENV_H5::HDF_Read(KQUESE, group_id, "KQUESE")))
+    {
         error_message[1] = "Error in bnkHDFRead. KQUESE array cannot be read.";
         StopByError(-3001, &error_message);
     }
 
-    if (!HDF_Read(this->KQUES, group_id, "KQUES")) {
+    if (!( = ENV_H5::HDF_Read(KQUES, group_id, "KQUES")))
+    {
         error_message[1] = "Error in bnkHDFRead. KQUES array cannot be read.";
         StopByError(-3001, &error_message);
     }
 
-    if (this->BnkMemb != nullptr) {
-        delete[] this->BnkMemb;
-    }
-    this->BnkMemb = new int64_t[this->KQUESE[0]];
+    PTR_DELETE(BnkMemb, []);
+    BnkMemb = new int64_t[this->KQUESE[0]];
 
-    if (!HDF_Read(this->BnkMemb, group_id, "BnkMemb")) {
+    if (!ENV_H5::HDF_Read(BnkMemb, group_id, "BnkMemb"))
+    {
         error_message[1] = "Error in bnkHDFRead. BnkMemb array cannot be read.";
         StopByError(-3001, &error_message);
     }
 
-    for (int i = this->KQUESE[1] + 1; i < this->KQUESE[0]; i++) {
-        bnk.BnkMemb[i] = ENV_0_I64;
+    for (int i = this->KQUESE[1] + 1; i < this->KQUESE[0]; i++)
+    {
+        BnkMemb[i] = ENV_0_I64;
     }
 
-    if (!HDF_Read(this->QueueWeight, group_id, "QueueWeight")) {
+    if (!ENV_H5::HDF_Read(this->QueueWeight, group_id, "QueueWeight"))
+    {
         error_message[1] = "Error in bnkHDFRead. QueueWeight array cannot be read.";
         StopByError(-3001, &error_message);
     }
 
-    if (GroupName.length() > 0) {
+    if (GroupName.length() > 0)
+    {
         H5Gclose(group_id);
         if (this->iError != ENV_0_I32) {
             error_message[1] = "Group Close Error '" + GroupName + "'.";
@@ -494,16 +501,17 @@ void BANK_Struct::HDFRead(hid_t parent_id, const std::string& Group = "") {
     }
 }
 
-void BANK_Struct::HDFWrite(hid_t parent_id, const std::string& Group = "") {
+void BANK_Struct::HDFWrite(hid_t parent_id, const std::string& Group)
+{
     hid_t group_id;
     std::string GroupName;
-    int32_t head_int32[BANK_INT32_ATTRIBUTES_COUNT];
     bool lError;
 
     this->pack();
 
     // Open an existing group in the specified file group.
-    if (!Group.empty()) {
+    if (!Group.empty())
+    {
         GroupName = Group;
         this->name = Group;
     }
@@ -511,51 +519,57 @@ void BANK_Struct::HDFWrite(hid_t parent_id, const std::string& Group = "") {
         GroupName = this->name;
     }
 
-    if (GroupName.length() > 0) {
+    if (GroupName.length() > 0)
+    {
         group_id = H5Gcreate(parent_id, GroupName.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-        if (group_id < 0) {
+        if (group_id < 0)
+        {
             error_message[1] = "Group Create Error '" + GroupName + "'.";
             StopByError(-3001, &error_message);
         }
     }
-    else {
+    else
+    {
         group_id = parent_id;
     }
 
-    head_int32[0] = this->NMQUE;
-    head_int32[1] = this->MPI_MODE;
-
-    lError = HDF_HeaderWriteSimple(group_id, "", BANK_INT32_ATTRIBUTES_NAMES, head_int32, this->iError);
+    VECTOR<INT32> head_int32{NMQUE, MPI_MODE};
+    lError = ENV_H5::HDF_Write_Attributes(head_int32, V_STRING{"", ""}, group_id);
     if (!lError) {
         error_message[1] = "ERROR in bnkHDFWrite: cannot write int32 attributes.";
         StopByError(-3001, &error_message);
     }
 
     // Write KQUESE array dataset.
-    if (!HDF_Write(this->KQUESE, group_id, "KQUESE")) {
+    if (!ENV_H5::HDF_Write(KQUESE, nKQUESE, group_id, "KQUESE"))
+    {
         error_message[1] = "Error in bnkHDFWrite. KQUESE array cannot be written.";
         StopByError(-3001, &error_message);
     }
 
     // Write KQUES array dataset.
-    if (!HDF_Write(this->KQUES, group_id, "KQUES")) {
+    if (!ENV_H5::HDF_Write(KQUES, , group_id, "KQUES"))
+    {
         error_message[1] = "Error in bnkHDFWrite. KQUES array cannot be written.";
         StopByError(-3001, &error_message);
     }
 
     // Write BnkMemb array dataset.
-    if (!HDF_Write(this->BnkMemb, group_id, "BnkMemb")) {
+    if (!ENV_H5::HDF_Write(BnkMemb, , group_id, "BnkMemb"))
+    {
         error_message[1] = "Error in bnkHDFWrite. BnkMemb array cannot be written.";
         StopByError(-3001, &error_message);
     }
 
     // Write QueueWeight array dataset.
-    if (!HDF_Write(this->QueueWeight, group_id, "QueueWeight")) {
+    if (!ENV_H5::HDF_Write(QueueWeight, , group_id, "QueueWeight"))
+    {
         error_message[1] = "Error in bnkHDFWrite. QueueWeight array cannot be written.";
         StopByError(-3001, &error_message);
     }
 
-    if (GroupName.length() > 0) {
+    if (GroupName.length() > 0)
+    {
         H5Gclose(group_id);
         if (this->iError != ENV_0_I32) {
             error_message[1] = "Error in bnkHDFWrite. Group Close Error '" + GroupName + "'.";

@@ -20,11 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\cpp\BNK\bank\bank.cpp" />
+    <ClCompile Include="..\src\cpp\ENV\hdf\ENV_HDF5.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\cpp\BNK\include\bank.hpp" />
-    <ClInclude Include="..\src\cpp\BNK\include\ENV_HDF5.hpp" />
-    <ClInclude Include="..\src\cpp\BNK\include\ENV_types.hpp" />
+    <ClInclude Include="..\src\cpp\ENV\include\ENV_HDF5.hpp" />
+    <ClInclude Include="..\src\cpp\ENV\include\ENV_types.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
