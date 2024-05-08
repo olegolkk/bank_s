@@ -252,8 +252,9 @@ void BANK_Struct::free(const INT64 NQUE, REAL64 WT, INT64 NN)
 }
 
 // Pack elements into the bank (move free place to the end of array)
-void BANK_Struct::pack(INT64 KFT, INT64 HQ0, INT64 KQB, INT64 KQT, INT64 LBLKD, INT64 MEM, INT64 NI)
+void BANK_Struct::pack()
 {
+    INT64 KFT, HQ0, KQB, KQT, LBLKD, MEM, NI;
     KFT = KQUESE[3];
     KQUESE[3] = ENV_0_I32;
     // Obtain the number of members
