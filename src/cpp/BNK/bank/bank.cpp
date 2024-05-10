@@ -460,15 +460,13 @@ void BANK_Struct::HDFRead(hid_t parent_id, const std::string& Group)
     MPI_MODE = result_int32[1];
     this->create(GroupName, MPI_MODE, NQUEUE);
 
-    INT64 kquese_length;
-    if (!(kquese_length = ENV_H5::HDF_Read(KQUESE, group_id, "KQUESE")))
+    if (!(nKQUESE = ENV_H5::HDF_Read(KQUESE, group_id, "KQUESE")))
     {
         error_message[1] = "Error in bnkHDFRead. KQUESE array cannot be read.";
         StopByError(-3001, &error_message);
     }
 
-    INT64 kques_length;
-    if (!(kques_length = ENV_H5::HDF_Read(KQUES, group_id, "KQUES")))
+    if (!(LHEADS = ENV_H5::HDF_Read(KQUES, group_id, "KQUES")))
     {
         error_message[1] = "Error in bnkHDFRead. KQUES array cannot be read.";
         StopByError(-3001, &error_message);
@@ -477,7 +475,7 @@ void BANK_Struct::HDFRead(hid_t parent_id, const std::string& Group)
     PTR_DELETE(BnkMemb, []);
     BnkMemb = new int64_t[this->KQUESE[0]];
 
-    if (!ENV_H5::HDF_Read(BnkMemb, group_id, "BnkMemb"))
+    if (!(KQUESE[1] = ENV_H5::HDF_Read(BnkMemb, group_id, "BnkMemb")))
     {
         error_message[1] = "Error in bnkHDFRead. BnkMemb array cannot be read.";
         StopByError(-3001, &error_message);
@@ -488,7 +486,7 @@ void BANK_Struct::HDFRead(hid_t parent_id, const std::string& Group)
         BnkMemb[i] = ENV_0_I64;
     }
 
-    if (!ENV_H5::HDF_Read(this->QueueWeight, group_id, "QueueWeight"))
+    if (!(NMQUE = ENV_H5::HDF_Read(this->QueueWeight, group_id, "QueueWeight")))
     {
         error_message[1] = "Error in bnkHDFRead. QueueWeight array cannot be read.";
         StopByError(-3001, &error_message);
@@ -558,16 +556,14 @@ void BANK_Struct::HDFWrite(hid_t parent_id, const std::string& Group)
     }
 
     // Write BnkMemb array dataset.
-    INT64 bnkMembLength = sizeof(BnkMemb) / sizeof(BnkMemb[0]);
-    if (!ENV_H5::HDF_Write(BnkMemb, bnkMembLength, group_id, "BnkMemb"))
+    if (!ENV_H5::HDF_Write(BnkMemb, KQUESE[1], group_id, "BnkMemb"))
     {
         error_message[1] = "Error in bnkHDFWrite. BnkMemb array cannot be written.";
         StopByError(-3001, &error_message);
     }
 
     // Write QueueWeight array dataset.
-    INT64 QueueWeightLength = sizeof(QueueWeight) / sizeof(QueueWeight[0]);
-    if (!ENV_H5::HDF_Write(QueueWeight, QueueWeightLength, group_id, "QueueWeight"))
+    if (!ENV_H5::HDF_Write(QueueWeight, NMQUE, group_id, "QueueWeight"))
     {
         error_message[1] = "Error in bnkHDFWrite. QueueWeight array cannot be written.";
         StopByError(-3001, &error_message);
